@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自我介绍 - 方楚铭</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "仿宋", SimSun, serif;
+            font-weight: bold;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f9f9f9;
+            padding: 0 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .main-1 {
+            font-weight: bold;
+            color: #d81b60;
+            text-decoration: none;
+            font-size: 1.2em;
+            transition: none;
+        }
+
+        .box1 {
+            color: inherit;
+            height: auto;
+            width: 100%;
+            background-color: #e6f7ff;
+            border-radius: 0;
+            padding: 50px 15px;
+            margin-bottom: 30px;
+            box-shadow: none;
+            text-align: center;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 90%;
+        }
+
+        .box1 h1 {
+            font-size: 3.5em;
+            margin-bottom: 40px;
+            color: #00665c;
+            text-shadow: none;
+            font-family: "仿宋", serif;
+        }
+
+        .box1 a {
+            display: inline-block;
+            padding: 10px 25px;
+            border: 2px solid #ff69b4;
+            border-radius: 50px;
+            background-color: #ffffff;
+        }
+
+        .card {
+            color: #333;
+            height: auto;
+            width: 100%;
+            background-color: #e0f2f1;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #d32f2f;
+            margin: 0 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #80cbc4;
+            display: inline-block;
+        }
+
+        [href*="images/"],
+        [href*="不满意的话.html"] {
+            color: #d81b60;
+            text-decoration: none;
+            font-size: 1.05em;
+            transition: all 0.3s;
+        }
+
+        [href*="images/"]:hover,
+        [href*="不满意的话.html"]:hover {
+            color: #1565c0;
+            text-decoration: underline;
+        }
+
+        span {
+            font-size: 1.05em;
+            color: #263238;
+            background-color: #f1f8e9;
+            padding: 5px 12px;
+            border-radius: 8px;
+        }
+
+        .card h1 {
+            font-size: 2.2em;
+            color: #1976d2;
+            margin: 0 0 20px;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #d84315;
+            margin: 35px 0 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        h3::before {
+            content: "✨";
+            margin-right: 10px;
+        }
+
+        h4 {
+            font-size: 1.3em;
+            color: #2e7d32;
+            margin: 25px 0 15px;
+        }
+
+        h5 {
+            font-size: 1.1em;
+            color: #c2185b;
+            margin: 15px 0 8px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            text-align: justify;
+            padding: 0 5px;
+        }
+
+        [href="山东青岛.html"] {
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: bolder;
+            font-size: 1.1em;
+        }
+
+        [href="山东青岛.html"]:hover {
+            color: #d81b60;
+            text-decoration: underline;
+        }
+
+        .img-placeholder {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            color: #666;
+        }
+
+
+        .box1 h1 {
+            font-size: 2.5em;
+        }
+
+        .btn-container {
+            gap: 10px;
+        }
+
+        .box1 a {
+            width: 60%;
+        }
+
+        h2 {
+            font-size: 1.5em;
+        }
+
+        .card h1 {
+            font-size: 1.8em;
+        }
+
+        .box1,
+        .card {
+            padding: 20px 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box1">
+            <h1>自我介绍</h1>
+            <div class="btn-container">
+                <a href="#1" class="main-1">姓名</a>
+                <a href="#2" class="main-1">样貌</a>
+                <a href="#3" class="main-1">兴趣爱好</a>
+                <a href="#4" class="main-1">来自</a>
+            </div>
+        </div>
+        <div class="card">
+            <h2 id="1">姓名</h2>
+            <p>我叫方楚铭，来自软工25-3，是全栈三组的</p>
+        </div>
+        <div class="card">
+            <h2 id="2">样貌</h2>
+            <a href="images/OIP-C copy.jpg" target="_blank" class="img-placeholder">如果你喜欢国外的话</a>
+            <br />
+            <a href="images/OIP-C.webp" target="_blank" class="img-placeholder">如果你喜欢国内的话</a><br />
+            <a href="如果你不满意的话.html" target="_blank">如果这两个你都不满意的话，请点击这里</a>
+        </div>
+        <div class="card">
+            <h2 id="3">兴趣爱好</h2>
+            <span>喜欢运动，比较喜欢打篮球和羽毛球，平常还喜欢打游戏，可以打和平精英</span>
+        </div>
+        <div class="card">
+            <h2 id="4">家庭地址</h2>
+            <p>我来自<a href="山东青岛.html" target="_blank">山东青岛</a></p>
+        </div>
+        <div class="card">
+            <h1>山东青岛</h1>
+            <p>青岛这地儿，就像个被大海宠坏的孩子 —— 左手啤酒，右手海鲜，天天在红瓦绿树间蹦跶。以下是本地人私藏的吃喝玩乐指南，保证让你笑出啤酒泡！</p>
+            <h3>🌊 玩在青岛：承包你的朋友圈九宫格</h3>
+            <p>修仙还是看红叶？小孩子才做选择！青岛的 “绿肺” 兼 “朋友圈摄影大赛决赛场”。秋天一到，九水的枫叶红得像被哪吒的风火轮扫过，蔚竹观的 800 岁古银杏下起 “黄金雨”，随手一拍都是《山海经》同款滤镜。记得走
+                “九水大循环” 路线，既能徒步吸氧，又能偶遇 350 岁的元宝槭古树，比见网友还惊喜。</p>
+            <p>极地之光・海上摩天轮：13 分 14 秒的云端告白青岛的 “海上钻戒”，66 米高空 360° 全景轿厢，转一圈刚好是 13 分 14 秒 —— 表白成功率直接拉满！白天能看到石老人海水浴场的
+                “钻石海”，晚上近十万颗 LED 灯把海面变成星空幕布，单身狗慎入，容易被狗粮齁到。</p>
+            <p>Usea 奇幻海世界：潜入元宇宙当海王全国首个 “海洋元宇宙” 乐园，VR 穿越侏罗纪、AR 和海豚共舞，还有国风海洋剧游让你过把仙侠瘾。最绝的是 270°
+                海景落地窗，玩累了往窗边一靠，栈桥和小青岛的美景尽收眼底，比手机壁纸还震撼。 太平山索道：《送你一朵小红花》同款浪漫电影取景地，缆车缓缓上升时，青岛的红瓦碧海像被打翻的调色盘铺在脚下。建议选下午 4
+                点的班次，既能捕捉 “橘子海” 落日，又能顺路去中山公园喂鸽子，文艺青年必打卡。</p>
+            <h3>🍤 吃在青岛：海鲜配啤酒，越吃越富有</h3>
+            <h4>海鲜三巨头：虾饺、蛤蜊、海胆饭</h4>
+            <h5>开海・红岛海鲜虾水饺</h5>
+            <p>开海・红岛海鲜虾水饺红岛大虾做的水饺，咬一口鲜到眉毛跳起来，建议 10:30 去占座，不然排队 1 小时起步。</p>
+            <h5>渔码头海鲜餐厅</h5>
+            <p>渔码头海鲜餐厅：18 年老店，香辣虾和酱爆鱿鱼须入味到骨髓，人均 70 元吃到撑，本地人私藏。</p>
+            <h5>柏海餐厅・海胆水饺</h5>
+            <p>柏海餐厅・海胆水饺：海胆馅会爆汁，搭配辣炒蛤蜊，再来杯青岛原浆，完美诠释 “青岛胃”。</p>
+            <p>网红餐厅：萌到犯规，好吃到流泪</p>
+            <h5>噜叫嗦粉店</h5>
+            <p>咕噜叫嗦粉店：大鲍岛的星之卡比主题餐厅，招牌杀猪粉汤底醇厚，甜品 “天空之境” 颜值爆表，适合带娃或闺蜜打卡。</p>
+            <h5>LAVUE 乐景餐厅</h5>
+            <p>LAVUE 乐景餐厅：奥帆中心的高空海景餐吧，晚上有驻唱歌手，边听爵士乐边看灯光秀，约会氛围感直接拉满。</p>
+            <p>啤酒配烧烤：青岛人的深夜食堂青岛啤酒博物馆必去！既能喝到刚下线的原浆，还能 get 啤酒洗头的奇妙体验（误）。喝完酒直奔营口路市场，买海鲜找路边大排档加工，推荐 “辣炒花蛤 + 烤鱿鱼 + 扎啤”
+                三件套，记得用塑料袋装啤酒才正宗哦！</p>
+            <h4>📌 冷知识彩蛋：青岛人の奇妙日常</h4>
+            <p>青岛人用塑料袋装啤酒，走在路上像拎着 “液体面包”，外地人第一次见可能会怀疑人生。</p>
+            <p>青岛话 “哈啤酒”=“喝啤酒”，“波螺油子” 不是海鲜，是指老城区的螺旋形马路。</p>
+            <p>八大关的每条路都以关隘命名，比如韶关路、嘉峪关路，迷路了记得看路牌，说不定能解锁新关卡。</p>
+            <p>青岛这座城，连海风都带着啤酒花的香气。快来吧，让我们一起 “哈啤酒，吃蛤蜊，听海浪讲笑话”！ 🌊🍻</p>
+        </div>
+    </div>
+</body>
+
+</html>
