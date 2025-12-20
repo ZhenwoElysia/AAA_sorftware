@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动保存备忘录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 i {
+            font-size: 2.8rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 700px;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            background: var(--light-color);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .search-box {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .memo-list {
+            list-style: none;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .memo-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .memo-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+        }
+
+        .memo-item.active {
+            border-color: var(--primary-color);
+            background: linear-gradient(90deg, rgba(67, 97, 238, 0.1), transparent);
+        }
+
+        .memo-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .memo-preview {
+            font-size: 13px;
+            color: #6c757d;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .memo-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 8px;
+        }
+
+        /* 编辑区域样式 */
+        .editor {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 15px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px !important;
+            min-height: 60px;
+        }
+
+        .tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-size: 10px;
+            padding: 2px;
+        }
+
+        .tag-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+            font-size: 14px;
+        }
+
+        textarea.form-control {
+            min-height: 300px;
+            resize: vertical;
+            font-family: 'Segoe UI', monospace;
+            line-height: 1.6;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            margin-top: auto;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-icon {
+            font-size: 18px;
+        }
+
+        .auto-save-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .save-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            color: var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                max-height: 300px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* 图标 */
+        .icon {
+            font-size: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-sticky-note"></i>
+                自动保存备忘录
+            </h1>
+            <p>您的想法，我们自动保存</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <div class="toolbar">
+                    <button class="btn btn-primary" onclick="createNewMemo()">
+                        <i class="fas fa-plus"></i>
+                        新建备忘录
+                    </button>
+                    <button class="btn btn-outline" onclick="exportMemos()">
+                        <i class="fas fa-download"></i>
+                        导出备忘录
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllMemos()">
+                        <i class="fas fa-trash"></i>
+                        清空所有
+                    </button>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" 
+                           id="searchInput" 
+                           placeholder="搜索备忘录..."
+                           oninput="searchMemos()">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+
+                <div class="memo-list" id="memoList">
+                    <!-- 备忘录列表会动态生成 -->
+                </div>
+            </div>
+
+            <!-- 编辑区域 -->
+            <div class="editor">
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-file-alt empty-icon"></i>
+                    <h3>暂无备忘录</h3>
+                    <p>点击"新建备忘录"开始记录</p>
+                </div>
+
+                <div id="editorContent" style="display: none;">
+                    <div class="form-group">
+                        <label for="memoTitle">
+                            <i class="fas fa-heading"></i>
+                            标题
+                        </label>
+                        <input type="text" 
+                               id="memoTitle" 
+                               class="form-control" 
+                               placeholder="输入备忘录标题"
+                               oninput="startAutoSave()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memoTags">
+                            <i class="fas fa-tags"></i>
+                            标签
+                        </label>
+                        <div class="form-control tags-input" id="tagsContainer">
+                            <input type="text" 
+                                   id="memoTags" 
+                                   class="tag-input" 
+                                   placeholder="输入标签后按回车"
+                                   onkeydown="handleTagInput(event)"
+                                   oninput="startAutoSave()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memoContent">
+                            <i class="fas fa-edit"></i>
+                            内容
+                        </label>
+                        <textarea id="memoContent" 
+                                  class="form-control" 
+                                  placeholder="开始记录您的想法..."
+                                  oninput="startAutoSave()"></textarea>
+                    </div>
+                </div>
+
+                <!-- 状态栏 -->
+                <div class="status-bar" id="statusBar">
+                    <div class="status-item">
+                        <i class="fas fa-save status-icon"></i>
+                        <span>自动保存状态: </span>
+                        <span class="auto-save-indicator">
+                            <span class="save-dot"></span>
+                            <span id="saveStatus">已启用</span>
+                        </span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock status-icon"></i>
+                        <span>最后保存: </span>
+                        <span id="lastSaveTime">从未保存</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-file-alt status-icon"></i>
+                        <span>总备忘录数: </span>
+                        <span id="memoCount">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AutoSaveMemoApp {
+            constructor() {
+                this.memos = [];
+                this.currentMemoId = null;
+                this.autoSaveTimer = null;
+                this.autoSaveDelay = 2000; // 2秒后自动保存
+                this.initialize();
+            }
+
+            initialize() {
+                this.loadMemos();
+                this.renderMemoList();
+                this.updateStatus();
+                this.setupEventListeners();
+                
+                // 定期自动备份
+                setInterval(() => this.backupMemos(), 60000); // 每分钟备份一次
+            }
+
+            loadMemos() {
+                try {
+                    const saved = localStorage.getItem('autoSaveMemos');
+                    if (saved) {
+                        this.memos = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error('加载备忘录失败:', error);
+                    this.memos = [];
+                }
+            }
+
+            saveMemos() {
+                try {
+                    localStorage.setItem('autoSaveMemos', JSON.stringify(this.memos));
+                    this.updateLastSaveTime();
+                } catch (error) {
+                    console.error('保存备忘录失败:', error);
+                }
+            }
+
+            backupMemos() {
+                try {
+                    const backupKey = `memoBackup_${new Date().toISOString().slice(0,10)}`;
+                    localStorage.setItem(backupKey, JSON.stringify(this.memos));
+                } catch (error) {
+                    console.error('备份失败:', error);
+                }
+            }
+
+            createNewMemo() {
+                const newMemo = {
+                    id: Date.now(),
+                    title: '未命名备忘录',
+                    content: '',
+                    tags: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                this.memos.unshift(newMemo);
+                this.saveMemos();
+                this.selectMemo(newMemo.id);
+                this.renderMemoList();
+            }
+
+            selectMemo(id) {
+                this.currentMemoId = id;
+                const memo = this.memos.find(m => m.id === id);
+                
+                if (memo) {
+                    document.getElementById('editorContent').style.display = 'block';
+                    document.getElementById('emptyState').style.display = 'none';
+                    
+                    document.getElementById('memoTitle').value = memo.title;
+                    document.getElementById('memoContent').value = memo.content;
+                    
+                    this.renderTags(memo.tags);
+                    
+                    // 更新列表项激活状态
+                    document.querySelectorAll('.memo-item').forEach(item => {
+                        item.classList.remove('active');
+                        if (parseInt(item.dataset.id) === id) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            }
+
+            updateCurrentMemo() {
+                if (!this.currentMemoId) return;
+
+                const memo = this.memos.find(m => m.id === this.currentMemoId);
+                if (memo) {
+                    memo.title = document.getElementById('memoTitle').value.trim() || '未命名备忘录';
+                    memo.content = document.getElementById('memoContent').value;
+                    memo.tags = Array.from(document.querySelectorAll('.tag')).map(tag => 
+                        tag.textContent.replace('×', '').trim()
+                    );
+                    memo.updatedAt = new Date().toISOString();
+                    
+                    this.saveMemos();
+                    this.renderMemoList();
+                }
+            }
+
+            startAutoSave() {
+                if (this.autoSaveTimer) {
+                    clearTimeout(this.autoSaveTimer);
+                }
+                
+                this.autoSaveTimer = setTimeout(() => {
+                    this.updateCurrentMemo();
+                }, this.autoSaveDelay);
+            }
+
+            deleteMemo(id) {
+                if (confirm('确定要删除这个备忘录吗？')) {
+                    const index = this.memos.findIndex(m => m.id === id);
+                    if (index !== -1) {
+                        this.memos.splice(index, 1);
+                        this.saveMemos();
+                        
+                        if (id === this.currentMemoId) {
+                            this.currentMemoId = null;
+                            document.getElementById('editorContent').style.display = 'none';
+                            document.getElementById('emptyState').style.display = 'flex';
+                        }
+                        
+                        this.renderMemoList();
+                    }
+                }
+            }
+
+            clearAllMemos() {
+                if (confirm('确定要清空所有备忘录吗？此操作不可恢复！')) {
+                    this.memos = [];
+                    this.currentMemoId = null;
+                    this.saveMemos();
+                    
+                    document.getElementById('editorContent').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'flex';
+                    this.renderMemoList();
+                }
+            }
+
+            searchMemos() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const listContainer = document.getElementById('memoList');
+                
+                if (!searchTerm) {
+                    this.renderMemoList();
+                    return;
+                }
+
+                const filteredMemos = this.memos.filter(memo =>
+                    memo.title.toLowerCase().includes(searchTerm) ||
+                    memo.content.toLowerCase().includes(searchTerm) ||
+                    memo.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+                );
+
+                this.renderMemoList(filteredMemos);
+            }
+
+            renderMemoList(memosToRender = this.memos) {
+                const listContainer = document.getElementById('memoList');
+                listContainer.innerHTML = '';
+
+                if (memosToRender.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search empty-icon"></i>
+                            <p>未找到备忘录</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                memosToRender.forEach(memo => {
+                    const preview = memo.content.length > 50 
+                        ? memo.content.substring(0, 50) + '...' 
+                        : memo.content;
+                    
+                    const date = new Date(memo.updatedAt);
+                    const timeString = date.toLocaleTimeString('zh-CN', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+
+                    const memoItem = document.createElement('div');
+                    memoItem.className = `memo-item ${memo.id === this.currentMemoId ? 'active' : ''}`;
+                    memoItem.dataset.id = memo.id;
+                    memoItem.innerHTML = `
+                        <div class="memo-title">${memo.title || '未命名备忘录'}</div>
+                        <div class="memo-preview">${preview}</div>
+                        <div class="memo-meta">
+                            <span>${timeString}</span>
+                            <span>
+                                <i class="fas fa-tag"></i>
+                                ${memo.tags.length}
+                            </span>
+                        </div>
+                    `;
+
+                    memoItem.onclick = () => this.selectMemo(memo.id);
+                    memoItem.oncontextmenu = (e) => {
+                        e.preventDefault();
+                        this.showContextMenu(e, memo.id);
+                        return false;
+                    };
+
+                    listContainer.appendChild(memoItem);
+                });
+
+                this.updateStatus();
+            }
+
+            renderTags(tags) {
+                const container = document.getElementById('tagsContainer');
+                const tagInput = document.getElementById('memoTags');
+                
+                // 移除现有标签（除了输入框）
+                while (container.firstChild !== tagInput) {
+                    container.removeChild(container.firstChild);
+                }
+
+                // 添加新标签
+                tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.innerHTML = `
+                        ${tag}
+                        <span class="tag-remove" onclick="removeTag(this)">×</span>
+                    `;
+                    container.insertBefore(tagElement, tagInput);
+                });
+            }
+
+            handleTagInput(event) {
+                if (event.key === 'Enter' || event.key === ',') {
+                    event.preventDefault();
+                    const input = document.getElementById('memoTags');
+                    const tag = input.value.trim();
+                    
+                    if (tag) {
+                        this.addTag(tag);
+                        input.value = '';
+                        this.startAutoSave();
+                    }
+                }
+            }
+
+            addTag(tagText) {
+                const container = document.getElementById('tagsContainer');
+                const tagInput = document.getElementById('memoTags');
+                
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.innerHTML = `
+                    ${tagText}
+                    <span class="tag-remove" onclick="removeTag(this)">×</span>
+                `;
+                
+                container.insertBefore(tagElement, tagInput);
+                this.startAutoSave();
+            }
+
+            removeTag(element) {
+                element.parentElement.remove();
+                this.startAutoSave();
+            }
+
+            showContextMenu(event, memoId) {
+                const menu = document.createElement('div');
+                menu.style.cssText = `
+                    position: fixed;
+                    left: ${event.pageX}px;
+                    top: ${event.pageY}px;
+                    background: white;
+                    border: 1px solid var(--border-color);
+                    border-radius: 5px;
+                    box-shadow: var(--shadow);
+                    z-index: 1000;
+                `;
+                
+                menu.innerHTML = `
+                    <div style="padding: 5px 0; min-width: 120px;">
+                        <button onclick="app.deleteMemo(${memoId}); this.parentElement.remove()" 
+                                style="width: 100%; text-align: left; padding: 8px 15px; 
+                                       border: none; background: none; cursor: pointer; color: var(--danger-color);">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(menu);
+                
+                // 点击其他地方关闭菜单
+                setTimeout(() => {
+                    const closeMenu = (e) => {
+                        if (!menu.contains(e.target)) {
+                            menu.remove();
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    };
+                    document.addEventListener('click', closeMenu);
+                }, 100);
+            }
+
+            exportMemos() {
+                const dataStr = JSON.stringify(this.memos, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `备忘录_${new Date().toISOString().slice(0,10)}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            }
+
+            updateStatus() {
+                document.getElementById('memoCount').textContent = this.memos.length;
+            }
+
+            updateLastSaveTime() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-CN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+                document.getElementById('lastSaveTime').textContent = timeString;
+            }
+
+            setupEventListeners() {
+                // 键盘快捷键
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + N: 新建备忘录
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                        e.preventDefault();
+                        this.createNewMemo();
+                    }
+                    
+                    // Ctrl/Cmd + S: 手动保存
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        this.updateCurrentMemo();
+                    }
+                    
+                    // Ctrl/Cmd + F: 搜索焦点
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                        e.preventDefault();
+                        document.getElementById('searchInput').focus();
+                    }
+                });
+            }
+        }
+
+        // 创建应用实例
+        let app;
+
+        // 页面加载完成后初始化应用
+        window.onload = function() {
+            app = new AutoSaveMemoApp();
+            
+            // 创建演示数据（首次使用时）
+            if (app.memos.length === 0) {
+                setTimeout(() => {
+                    if (confirm('是否创建示例备忘录？')) {
+                        createDemoData();
+                    }
+                }, 1000);
+            }
+        };
+
+        // 全局函数供HTML按钮调用
+        function createNewMemo() {
+            app.createNewMemo();
+        }
+
+        function startAutoSave() {
+            app.startAutoSave();
+        }
+
+        function searchMemos() {
+            app.searchMemos();
+        }
+
+        function clearAllMemos() {
+            app.clearAllMemos();
+        }
+
+        function exportMemos() {
+            app.exportMemos();
+        }
+
+        function handleTagInput(event) {
+            app.handleTagInput(event);
+        }
+
+        function removeTag(element) {
+            app.removeTag(element);
+        }
+
+        function createDemoData() {
+            const demos = [
+                {
+                    title: '购物清单',
+                    content: '1. 牛奶\n2. 鸡蛋\n3. 面包\n4. 水果\n5. 蔬菜',
+                    tags: ['购物', '日常']
+                },
+                {
+                    title: '项目计划',
+                    content: '第一阶段：需求分析（1-2周）\n第二阶段：设计开发（3-4周）\n第三阶段：测试部署（1-2周）',
+                    tags: ['工作', '项目']
+                },
+                {
+                    title: '学习计划',
+                    content: '每天学习2小时\n周末复习本周内容\n每月完成一个项目实践',
+                    tags: ['学习', '计划']
+                }
+            ];
+
+            demos.forEach(demo => {
+                const newMemo = {
+                    id: Date.now() + Math.random(),
+                    ...demo,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                app.memos.push(newMemo);
+            });
+
+            app.saveMemos();
+            app.renderMemoList();
+        }
+
+        // 防止页面关闭时数据丢失
+        window.addEventListener('beforeunload', () => {
+            app.updateCurrentMemo();
+        });
+    </script>
+</body>
+</html>
